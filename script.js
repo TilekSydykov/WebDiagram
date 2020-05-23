@@ -41,7 +41,7 @@ c.canvas.onmousemove = function(e){
 };
 
 c.canvas.onmouseup = function(e){
-    c.deselectNode();
+    c.deselectNode(e);
 };
 
 window.addEventListener("wheel", function (e) {

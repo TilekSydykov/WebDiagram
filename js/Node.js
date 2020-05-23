@@ -1,25 +1,4 @@
-class NodeTitle {
-    width = 0;
-    x = 0;
-    y = 0;
-    txt;
-    constructor(x, y, width, text) {
-        this.width = width;
-        this.x = x;
-        this.y = y;
-        this.txt = text;
-    }
-}
-
-class NodePoint {
-    x = 0;
-    y = 0;
-    r = 3.7;
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
+import {NodeTitle, NodePoint} from './Util.js';
 
 export class Node {
     x = 100;
@@ -40,12 +19,13 @@ export class Node {
     color = '#929093';
 
     namePadding = 10 + 10;
-    titleFont = '12px Arial';
+    titleFont = 'lighter 12px Arial';
     titleColor = '#fff';
     titleMargin = 10;
 
     init(ctx) {
         this.height += this.headerHeight;
+
         let outputLength = this.output.length;
         let item;
         let outputsMaxWidth = 10;
@@ -54,7 +34,6 @@ export class Node {
         let textMetrics;
         for (let i = 0; i < outputLength; i++) {
             item = this.output[i];
-
             textMetrics = ctx.measureText(item);
             if (outputsMaxWidth < textMetrics.width + 20){
                 outputsMaxWidth = textMetrics.width + 20
@@ -78,7 +57,7 @@ export class Node {
 
             this.points.push(new NodePoint(
                 0,
-                this.headerHeight + this.itemHeight * (i + 1) - (this.itemHeight / 2)));
+                this.headerHeight + this.itemHeight * (i + 1) - (this.itemHeight / 2), 'i'));
 
             if (inputMaxWidth < textMetrics.width + 20){
                 inputMaxWidth = textMetrics.width + 20
@@ -100,10 +79,12 @@ export class Node {
 
             this.points.push(new NodePoint(
                 this.width,
-                this.headerHeight + this.itemHeight * (i + 1) - (this.itemHeight / 2)));
-
+                this.headerHeight + this.itemHeight * (i + 1) - (this.itemHeight / 2),
+                'o'));
         }
+
         this.heightMultiplier = Math.max(this.output.length, this.input.length);
+        this.height = this.itemHeight * this.heightMultiplier;
         return this;
     }
 
@@ -122,22 +103,20 @@ export class Node {
             this.x,
             this.y + this.headerHeight,
             this.width,
-            this.itemHeight * this.heightMultiplier
+            this.height
         );
         context.fill();
         let item;
-        let length = this.points.length;
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < this.points.length; i++) {
             item = this.points[i];
             context.beginPath();
             context.fillStyle = '#ffffff';
             context.arc(this.x + item.x, this.y + item.y, item.r, 0, 2 * Math.PI);
             context.fill();
         }
-        length = this.titles.length;
         context.font = this.titleFont;
         context.fillStyle = this.titleColor;
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < this.titles.length; i++) {
             item = this.titles[i];
             context.fillText(item.txt, this.x + item.x , this.y + item.y);
         }
@@ -162,6 +141,26 @@ export class Node {
             y > this.y &&
             y < this.y + this.headerHeight
     }
+
+    isInBounds(x, y) {
+        let r = 4;
+        return x > this.x - r &&
+            x < this.x + this.width + r &&
+            y > this.y + this.headerHeight &&
+            y < this.y + this.height + this.headerHeight
+    }
+
+    isPointSelected(x, y){
+        let item = null;
+        for (let i = 0; i < this.points.length; i++) {
+            item = this.points[i];
+            if (x > item.x + this.x - item.r  &&
+                x < item.x + this.x - item.r + item.r * 2 &&
+                y > item.y + this.y - item.r &&
+                y < item.y + this.y - item.r + item.r * 2){
+                return {item, i};
+            }
+        }
+        return null;
+    }
 }
-
-

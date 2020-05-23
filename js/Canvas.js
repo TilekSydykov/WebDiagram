@@ -1,26 +1,37 @@
+import {LineData} from "./Util.js";
+
 export class Canvas {
     canvas;
     context;
     height;
     width;
     scale = 15;
+
     selectedNodeInfo = {
         id: -1,
         dy: 0,
         dx: 0
     };
-    entireMoveInfo= {
+
+    entireMoveInfo = {
         isEnabled: false,
         ly: 0,
         lx: 0
     };
+
+    selectedPointInfo = {
+        point: null,
+        nodeIndex: -1,
+        pointIndex: -1
+    };
+
     nodes = [];
+    lines = [];
 
     constructor(containerId) {
         this.canvas = document.getElementById(containerId);
         this.context = this.canvas.getContext('2d');
         this.resizeUpdate();
-
 
     }
 
@@ -47,31 +58,52 @@ export class Canvas {
             dy: n[id].height / 2,
             dx: n[id].width / 2
         };
-
-
     }
 
     update() {
         this.canvas.width = this.width;
-        let n = this.nodes.length;
         let node;
-        for (let i = 0; i < n; i++) {
+        let x;
+        let y;
+        for (let i = 0; i < this.nodes.length; i++) {
             node = this.nodes[i];
             if (node.x + node.width > 0 || node.y + node.height > 0 || node.x < this.width || node.y < this.height){
                 node.draw(this.context)
             }
         }
-
+        let line;
+        this.context.strokeStyle = '#fff';
+        for (let i = 0; i < this.lines.length; i++){
+            line = this.lines[i];
+            this.context.beginPath();
+            x = this.nodes[line.nodeOneIndex].x + this.nodes[line.nodeOneIndex].points[line.pointOneIndex].x;
+            y = this.nodes[line.nodeOneIndex].y + this.nodes[line.nodeOneIndex].points[line.pointOneIndex].y;
+            this.context.moveTo(x, y);
+            x = this.nodes[line.nodeTwoIndex].x + this.nodes[line.nodeTwoIndex].points[line.pointTwoIndex].x;
+            y = this.nodes[line.nodeTwoIndex].y + this.nodes[line.nodeTwoIndex].points[line.pointTwoIndex].y;
+            this.context.lineTo(x, y);
+            this.context.stroke();
+        }
     }
 
     selectNode(event) {
         let pos = this.getMousePos(this.canvas, event);
-        for (let i = 0; i < this.nodes.length; i++) {
+        let length = this.nodes.length;
+        for (let i = 0; i < length; i++) {
             if (this.nodes[i].isSelected(pos.x , pos.y)) {
                 this.selectedNodeInfo.id = i;
                 this.selectedNodeInfo.dx = pos.x - this.nodes[i].x;
                 this.selectedNodeInfo.dy = pos.y - this.nodes[i].y;
                 return
+            }
+            if (this.nodes[i].isInBounds(pos.x , pos.y)){
+                let pointInfo = this.nodes[i].isPointSelected(pos.x , pos.y);
+                if (pointInfo !== null){
+                    this.selectedPointInfo.point = pointInfo.item;
+                    this.selectedPointInfo.nodeIndex = i;
+                    this.selectedPointInfo.pointIndex = pointInfo.i;
+                    return;
+                }
             }
         }
     }
@@ -88,7 +120,6 @@ export class Canvas {
         let pos = this.getMousePos(this.canvas, e);
 
         if (this.entireMoveInfo.isEnabled){
-
             let dx = this.entireMoveInfo.lx - e.screenX;
             let dy = this.entireMoveInfo.ly - e.screenY;
 
@@ -108,6 +139,17 @@ export class Canvas {
                 pos.y - this.selectedNodeInfo.dy);
             this.update();
         }
+
+        if (this.selectedPointInfo.point !== null){
+            this.update();
+            this.context.beginPath();
+            this.context.strokeStyle = '#fff';
+            this.context.moveTo(
+                this.selectedPointInfo.point.x + this.nodes[this.selectedPointInfo.nodeIndex].x,
+                this.selectedPointInfo.point.y + this.nodes[this.selectedPointInfo.nodeIndex].y);
+            this.context.lineTo(pos.x, pos.y);
+            this.context.stroke();
+        }
     }
 
     entireMove(e){
@@ -116,9 +158,44 @@ export class Canvas {
         this.entireMoveInfo.ly = e.screenY;
     }
 
-    deselectNode() {
+    deselectNode(e) {
+        let pos = this.getMousePos(this.canvas, e);
+
         this.entireMoveInfo.isEnabled = false;
-        this.selectedNodeInfo.id = -1
+        this.selectedNodeInfo.id = -1;
+
+        if (this.selectedPointInfo.point !== null){
+            for (let i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].isInBounds(pos.x , pos.y)){
+                    let pointInfo = this.nodes[i].isPointSelected(pos.x , pos.y);
+                    if (pointInfo !== null &&
+                        this.selectedPointInfo.nodeIndex !== i &&
+                        this.selectedPointInfo.point.type !== pointInfo.item.type){
+                        let exist = false;
+                        let line = new LineData(
+                            this.selectedPointInfo.nodeIndex,
+                            this.selectedPointInfo.pointIndex,
+                            i, pointInfo.i
+                        );
+                        for (let j = 0; j < this.lines.length; j++) {
+                            if (this.lines[j].id === line.id){
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if (!exist){
+                            this.lines.push(line);
+                        }
+                        this.selectedPointInfo.point = null;
+                        return;
+                    }
+                }
+            }
+            this.selectedPointInfo.point = null;
+            this.update();
+        }
+
+        this.selectedPointInfo.point = null;
     }
 
     wheelListener(e) {
