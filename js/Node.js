@@ -2,21 +2,25 @@ class NodeTitle {
     width = 0;
     x = 0;
     y = 0;
-    constructor(x, y, width) {
+    txt;
+    constructor(x, y, width, text) {
         this.width = width;
         this.x = x;
         this.y = y;
+        this.txt = text;
     }
 }
+
 class NodePoint {
     x = 0;
     y = 0;
-    r = 4.1;
+    r = 3.7;
     constructor(x, y) {
         this.x = x;
         this.y = y;
     }
 }
+
 export class Node {
     x = 100;
     y = 100;
@@ -35,24 +39,69 @@ export class Node {
 
     color = '#929093';
 
-    titlePadding = 10 + 10;
+    namePadding = 10 + 10;
+    titleFont = '12px Arial';
+    titleColor = '#fff';
+    titleMargin = 10;
 
-    init() {
+    init(ctx) {
         this.height += this.headerHeight;
         let outputLength = this.output.length;
         let item;
+        let outputsMaxWidth = 10;
+        let inputMaxWidth = 10;
+        ctx.font = this.titleFont;
+        let textMetrics;
         for (let i = 0; i < outputLength; i++) {
-
             item = this.output[i];
-            this.points.push(new NodePoint(
-                 this.width,
-                 this.headerHeight + this.itemHeight * (i + 1) - (this.itemHeight / 2)));
+
+            textMetrics = ctx.measureText(item);
+            if (outputsMaxWidth < textMetrics.width + 20){
+                outputsMaxWidth = textMetrics.width + 20
+            }
         }
+
         let inputLength = this.input.length;
+        let title = '';
         for (let i = 0; i < inputLength; i++) {
-           this.points.push(new NodePoint(
+            item = this.input[i];
+            for (let prop in item){
+                title = prop + ": " + item[prop];
+            }
+            textMetrics = ctx.measureText(title);
+            this.titles.push(new NodeTitle(
+                 this.titleMargin ,
+                this.headerHeight + this.itemHeight * (i + 1) - (this.itemHeight / 2) + 3,
+                textMetrics.width,
+                title
+            ));
+
+            this.points.push(new NodePoint(
                 0,
                 this.headerHeight + this.itemHeight * (i + 1) - (this.itemHeight / 2)));
+
+            if (inputMaxWidth < textMetrics.width + 20){
+                inputMaxWidth = textMetrics.width + 20
+            }
+        }
+
+        this.width = inputMaxWidth + outputsMaxWidth + 20;
+
+        for (let i = 0; i < outputLength; i++) {
+            item = this.output[i];
+
+            textMetrics = ctx.measureText(item);
+            this.titles.push(new NodeTitle(
+                this.width - this.titleMargin - textMetrics.width,
+                this.headerHeight + this.itemHeight * (i + 1) - (this.itemHeight / 2) + 3,
+                textMetrics.width,
+                item
+            ));
+
+            this.points.push(new NodePoint(
+                this.width,
+                this.headerHeight + this.itemHeight * (i + 1) - (this.itemHeight / 2)));
+
         }
         this.heightMultiplier = Math.max(this.output.length, this.input.length);
         return this;
@@ -66,7 +115,7 @@ export class Node {
         context.fill();
         context.fillStyle = '#000';
         context.font = "15px Arial";
-        context.fillText(this.name, this.x + 10 , this.y + this.titlePadding);
+        context.fillText(this.name, this.x + 10 , this.y + this.namePadding);
         context.beginPath();
         context.fillStyle = '#000';
         context.rect(
@@ -77,13 +126,20 @@ export class Node {
         );
         context.fill();
         let item;
-        let pointLength = this.points.length;
-        for (let i = 0; i < pointLength; i++) {
+        let length = this.points.length;
+        for (let i = 0; i < length; i++) {
             item = this.points[i];
             context.beginPath();
             context.fillStyle = '#ffffff';
             context.arc(this.x + item.x, this.y + item.y, item.r, 0, 2 * Math.PI);
             context.fill();
+        }
+        length = this.titles.length;
+        context.font = this.titleFont;
+        context.fillStyle = this.titleColor;
+        for (let i = 0; i < length; i++) {
+            item = this.titles[i];
+            context.fillText(item.txt, this.x + item.x , this.y + item.y);
         }
     }
 

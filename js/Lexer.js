@@ -38,6 +38,8 @@ export class Lexer {
                     isInputMode = false;
                     if (tokens[i+1] === this.inputTypeChar){
                         node.output.push(tokens[i+2]);
+                    }else{
+                        console.error("Error in type declaration")
                     }
                 }
                 if (isInputMode){
@@ -47,7 +49,6 @@ export class Lexer {
                         node.input.push(j);
                     }
                 }
-
             }
             if (openedCurlyBrakets >= 1){
                 node.body += func + ' ';

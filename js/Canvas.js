@@ -20,6 +20,8 @@ export class Canvas {
         this.canvas = document.getElementById(containerId);
         this.context = this.canvas.getContext('2d');
         this.resizeUpdate();
+
+
     }
 
     resizeUpdate() {
@@ -44,7 +46,9 @@ export class Canvas {
             id : id,
             dy: n[id].height / 2,
             dx: n[id].width / 2
-        }
+        };
+
+
     }
 
     update() {
@@ -57,6 +61,7 @@ export class Canvas {
                 node.draw(this.context)
             }
         }
+
     }
 
     selectNode(event) {

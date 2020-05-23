@@ -11,7 +11,7 @@ c.update();
 let f = new Finder('finder', node => {
     let n = new Node();
     Object.assign(n, node);
-    c.addNodeWithDrag(n.init());
+    c.addNodeWithDrag(n.init(c.context));
     f.hide();
 });
 
