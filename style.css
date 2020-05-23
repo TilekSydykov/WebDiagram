@@ -1,0 +1,112 @@
+#main{
+    height: 100vh;
+    background: #3d3d3d;
+    z-index: -1;
+}
+.app{
+    width: 100%;
+    height: 100vh;
+}
+body{
+    margin: 0 ;
+    padding: 0;
+    width: 100vw;
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: 'DM Mono', monospace;
+    background: #1a0d1a;
+    color: #9c999c;
+}
+.body{
+    position: absolute;
+    min-height: 100vh;
+    display: inline-flex;
+}
+#menu{
+    width: 50px;
+    background: #000000;
+    z-index: 10;
+    color: white;
+    border-radius: 5px;
+    border: 2px solid #4a4a4a;
+    padding: 10px;
+}
+.menu_item{
+    margin: 2px;
+    border: 1px solid #545154;
+    padding: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+#editor{
+    position: absolute;
+}
+#finder{
+    margin: 100px;
+    left: auto;
+    right: auto;
+    position: absolute;
+    height: 600px;
+    width: 1000px;
+    background: rgba(0,0,0,1);
+    z-index: 10;
+    border-radius: 2px;
+    border: 2px solid #323232;
+    color: #9c999c;
+}
+.finder_header{
+    background: #151515;
+    height: 100px;
+    width: 100%;
+    border-bottom: 2px solid #323232;
+    display: inline-flex;
+}
+.finder_header input{
+    margin: 10px;
+
+}
+.input{
+    padding: 5px;
+    background: #3d3d3d;
+    border: none;
+    color: #9c999c;
+    width: 95%;
+}
+.btn{
+    padding: 5px;
+    background: #3d3d3d;
+    border: none;
+    color: #9c999c;
+}
+.click{
+    cursor: pointer;
+}
+.w-80{
+    width: 80%;
+}
+.w-90{
+    width: 90%;
+}
+.w-20{
+    width: 20%;
+}
+.w-10{
+    width: 10%;
+}
+
+.finder_nodes{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.finder_node{
+    margin: 10px;
+    width: 100px;
+    padding: 10px;
+    font-size: 20px;
+    text-align: center;
+    background: #9c999c;
+    color: black;
+    cursor: pointer;
+}

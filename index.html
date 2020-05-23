@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital@1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+<div class="body">
+    <div id="menu">
+        <div class="menu_item" id="open_add_menu">
+            <i class="material-icons">add</i>
+        </div>
+    </div>
+    <div class="app">
+        <canvas id="main"></canvas>
+    </div>
+</div>
+
+<div id="finder">
+    <i class="material-icons click" id="close_add_menu">close</i>
+    <div class="finder_header">
+        <div class="w-90">
+            <input type="text" class="input" placeholder="link" value="http://localhost:63342/untitled1/sdk.js" id="nodesSdk">
+        </div>
+        <div class="w-10">
+            <input type="button" class="btn" value="search" id="getNodes">
+        </div>
+    </div>
+    <div class="finder_nodes" id="nodes_container">
+
+    </div>
+</div>
+
+<script type="module" src="script.js"></script>
+
+</body>
+</html>
