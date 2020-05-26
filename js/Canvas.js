@@ -1,4 +1,5 @@
 import {LineData} from "./Util.js";
+import {Const} from "./Const.js";
 
 export class Canvas {
     canvas;
@@ -99,9 +100,26 @@ export class Canvas {
             if (this.nodes[i].isInBounds(pos.x , pos.y)){
                 let pointInfo = this.nodes[i].isPointSelected(pos.x , pos.y);
                 if (pointInfo !== null){
-                    this.selectedPointInfo.point = pointInfo.item;
-                    this.selectedPointInfo.nodeIndex = i;
-                    this.selectedPointInfo.pointIndex = pointInfo.i;
+                    if (pointInfo.item.type === Const.pointInputType){
+                        let line = this.findLineWithInputPoint(pointInfo.i, i);
+                        if (line !== -1){
+                            this.selectedPointInfo.point =
+                                this.nodes[this.lines[line].nodeOneIndex].points[this.lines[line].pointOneIndex];
+
+                            this.selectedPointInfo.nodeIndex = this.lines[line].nodeOneIndex;
+                            this.selectedPointInfo.pointIndex = this.lines[line].pointOneIndex;
+
+                            this.lines.splice(line, 1);
+                            return;
+                        }
+                        this.selectedPointInfo.point = pointInfo.item;
+                        this.selectedPointInfo.nodeIndex = i;
+                        this.selectedPointInfo.pointIndex = pointInfo.i;
+                    }else{
+                        this.selectedPointInfo.point = pointInfo.item;
+                        this.selectedPointInfo.nodeIndex = i;
+                        this.selectedPointInfo.pointIndex = pointInfo.i;
+                    }
                     return;
                 }
             }
@@ -171,30 +189,45 @@ export class Canvas {
                     if (pointInfo !== null &&
                         this.selectedPointInfo.nodeIndex !== i &&
                         this.selectedPointInfo.point.type !== pointInfo.item.type){
-                        let exist = false;
-                        let line = new LineData(
-                            this.selectedPointInfo.nodeIndex,
-                            this.selectedPointInfo.pointIndex,
-                            i, pointInfo.i
-                        );
-                        for (let j = 0; j < this.lines.length; j++) {
-                            if (this.lines[j].id === line.id){
-                                exist = true;
-                                break;
+                        let line;
+                        if (this.selectedPointInfo.point.type === Const.pointOutputType){
+                            // first point OUTPUT second is INPUT
+                            let line = this.findLineWithInputPoint(pointInfo.i, i);
+                            if (line !== -1){
+                                this.selectedPointInfo.point = null;
+                                this.update();
+                                return;
                             }
+                             line = new LineData(
+                                this.selectedPointInfo.nodeIndex,
+                                this.selectedPointInfo.pointIndex,
+                                i, pointInfo.i
+                             );
+                            this.addLineIfDoesNotExist(line)
+                        }else{
+                            // fist point INPUT second is OUTPUT
+                            let line = this.findLineWithInputPoint(
+                                this.selectedPointInfo.nodeIndex,
+                                this.selectedPointInfo.pointIndex);
+                            if (line !== -1){
+                                this.selectedPointInfo.point = null;
+                                this.update();
+                                return;
+                            }
+                            line = new LineData(
+                                i, pointInfo.i,
+                                this.selectedPointInfo.nodeIndex,
+                                this.selectedPointInfo.pointIndex
+                            );
+                            this.addLineIfDoesNotExist(line)
                         }
-                        if (!exist){
-                            this.lines.push(line);
-                        }
-                        this.selectedPointInfo.point = null;
-                        return;
+
                     }
                 }
             }
             this.selectedPointInfo.point = null;
             this.update();
         }
-
         this.selectedPointInfo.point = null;
     }
 
@@ -203,5 +236,29 @@ export class Canvas {
 
         this.resizeUpdate();
         this.update();
+    }
+
+    addLineIfDoesNotExist(line){
+        let exist = false;
+        for (let j = 0; j < this.lines.length; j++) {
+            if (this.lines[j].id === line.id){
+                exist = true;
+                break;
+            }
+        }
+        if (!exist){
+            this.lines.push(line);
+        }
+        this.selectedPointInfo.point = null;
+    }
+
+
+    findLineWithInputPoint(pointIndex, pointNodeIndex){
+        for (let i = 0; i < this.lines.length; i++) {
+            if (this.lines[i].pointTwoIndex === pointIndex && this.lines[i].nodeTwoIndex === pointNodeIndex){
+                return i
+            }
+        }
+        return -1;
     }
 }

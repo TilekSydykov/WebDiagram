@@ -19,8 +19,8 @@ export class Node {
     color = '#929093';
 
     namePadding = 10 + 10;
-    titleFont = 'lighter 12px Arial';
-    titleColor = '#fff';
+    titleFont = '100 12px Arial';
+    titleColor = '#b4b4b4';
     titleMargin = 10;
 
     init(ctx) {
@@ -152,12 +152,14 @@ export class Node {
 
     isPointSelected(x, y){
         let item = null;
+
         for (let i = 0; i < this.points.length; i++) {
             item = this.points[i];
-            if (x > item.x + this.x - item.r  &&
-                x < item.x + this.x - item.r + item.r * 2 &&
-                y > item.y + this.y - item.r &&
-                y < item.y + this.y - item.r + item.r * 2){
+            let radius = item.r + 5;
+            if (x > item.x + this.x - radius  &&
+                x < item.x + this.x - radius + radius * 2 &&
+                y > item.y + this.y - radius &&
+                y < item.y + this.y - radius + radius * 2){
                 return {item, i};
             }
         }

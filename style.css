@@ -4,7 +4,7 @@
     z-index: -1;
 }
 .app{
-    width: 100%;
+    width: 80%;
     height: 100vh;
 }
 body{
@@ -18,6 +18,7 @@ body{
     color: #9c999c;
 }
 .body{
+    width: 100vw;
     position: absolute;
     min-height: 100vh;
     display: inline-flex;
@@ -27,7 +28,19 @@ body{
     background: #000000;
     z-index: 10;
     color: white;
-    border-radius: 5px;
+    border: 2px solid #4a4a4a;
+    padding: 10px;
+}
+#details{
+    min-width: 50px;
+    width: 200px;
+    background: #000000;
+    z-index: 10;
+    position: absolute;
+    height: 98vh;
+    left: auto;
+    right: 0;
+    color: white;
     border: 2px solid #4a4a4a;
     padding: 10px;
 }
@@ -93,13 +106,11 @@ body{
 .w-10{
     width: 10%;
 }
-
 .finder_nodes{
     display: flex;
     flex-wrap: wrap;
     padding: 10px;
 }
-
 .finder_node{
     margin: 10px;
     width: 100px;
